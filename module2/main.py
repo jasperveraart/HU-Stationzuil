@@ -21,6 +21,13 @@ from kivy.properties import NumericProperty, StringProperty
 load_dotenv()
 
 def user_create(name, email, password):
+    """
+    Create a moderator
+    :param name:
+    :param email:
+    :param password:
+    :return: none
+    """
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_NAME"),
@@ -53,10 +60,13 @@ def user_create(name, email, password):
 
     conn.close()
 
-def user_change(email, old_password, new_password):
-    pass
-
 def user_check(email, password):
+    """
+    Check if username and password exists and match
+    :param email:
+    :param password:
+    :return: moderatorid
+    """
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_NAME"),
@@ -87,6 +97,11 @@ def user_check(email, password):
     conn.close()
 
 def get_moderator(id: int):
+    """
+    Get the ID and name of the moderator
+    :param id:
+    :return: {id, name}
+    """
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_NAME"),
@@ -105,6 +120,10 @@ def get_moderator(id: int):
     return {"id": id, "name": reply[0][1]}
 
 def get_messages_to_moderate():
+    """
+    Get all messages with status 1 (not moderated yet)
+    :return: [{id, message}]
+    """
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_NAME"),
@@ -128,6 +147,14 @@ def get_messages_to_moderate():
     return messages
 
 def get_all_messages():
+    """
+    Get all messages with the status of the message
+    Status:
+    0 - Declined
+    1 - Not moderated
+    2 - Approved
+    :return: [{id, message, status}]
+    """
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_NAME"),
@@ -151,6 +178,13 @@ def get_all_messages():
     return messages
 
 def change_status(messageid: int, new_status: int, moderator:int):
+    """
+    Change the status of a message
+    :param messageid:
+    :param new_status:
+    :param moderator:
+    :return: none
+    """
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_NAME"),
@@ -170,7 +204,7 @@ def change_status(messageid: int, new_status: int, moderator:int):
     conn.commit()
     conn.close()
 
-
+# Custom Carousel property for swiping the messages
 class CustomCarousel(Carousel):
     def __init__(self, **kwargs):
         super(CustomCarousel, self).__init__(**kwargs)
@@ -210,9 +244,11 @@ class CustomCarousel(Carousel):
         self._touch_distance = 0
         return super(CustomCarousel, self).on_touch_up(touch)
 
+# Custom ImageButton for clickable images (NS Logo)
 class ImageButton(ButtonBehavior, Image):
     pass
 
+# Custom MessageLabel for storing message id behind screen
 class MessageLabel(Label):
     message_id = NumericProperty(0)
 
@@ -232,6 +268,7 @@ class MessageLabel(Label):
             while self.texture_size[1] < self.height and self.font_size < 35:
                 self.font_size += 1
 
+# Custom MessageRow for displaying all messages
 class MessageRow(RecycleDataViewBehavior, BoxLayout):
     """ Custom view voor een rij in de tabel. """
     message_id = StringProperty()
@@ -272,6 +309,7 @@ class MessageRow(RecycleDataViewBehavior, BoxLayout):
             self.ids.label_id.color = (0.85882, 0, 0.16078, 1)
 
 
+# Login screen
 class LoginWidget(Screen):
     user_id = NumericProperty()
 
@@ -300,6 +338,7 @@ class LoginWidget(Screen):
             self.user_id = user
             self.manager.current = 'moderate'
 
+# Moderation screen
 class ModerateWidget(Screen):
     user_id = NumericProperty()
 
@@ -389,6 +428,7 @@ class ModerateWidget(Screen):
             if not self.messages:
                 self.show_reload_button()
 
+# All messages screen
 class SettingsWidget(Screen):
     user_id = NumericProperty()
 
@@ -423,9 +463,10 @@ class ModeratieApp(App):
         sm.add_widget(ModerateWidget(name='moderate'))
         sm.add_widget(SettingsWidget(name='settings'))
 
+        # Startup screen signin
         sm.current = 'signin'
         return sm
-#
+
 ModeratieApp().run()
-# user_create("Jasper", "jasper@veraart.ziggo.nl", "Welkom123")
+# user_create("Jasper", "jasper@veraart.cloud", "Welkom123")
 # user_create("Simone", "simone@student.hu.nl", "Welkom123")

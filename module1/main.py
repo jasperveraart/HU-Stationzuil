@@ -8,17 +8,18 @@ from kivy.app import App
 import database
 
 
+# main screen
 class RootWidget(Screen):
     def send_message(self):
         message_text = self.ids.message.text
         name_text = self.ids.name.text
+        # read city of zuil
         f = open("module1/stationzuil.txt", "r")
         city = f.read()
 
 
 
         if message_text == "admin" and name_text == "admin":
-            print("Ziet hij dit")
             self.ids.message.text = ""
             self.ids.name.text = ""
             self.manager.current = 'dynamic'
@@ -33,23 +34,23 @@ class RootWidget(Screen):
         self.ids.message.text = ""
         self.ids.name.text = ""
 
+# Admin screen (change station)
 class DynamicGrid(Screen):
     def __init__(self, **kwargs):
         super(DynamicGrid, self).__init__(**kwargs)
 
         data_list = database.get_station_list()
 
-        grid = GridLayout(cols=4)  # Je kunt het aantal kolommen wijzigen naar wens
-        self.add_widget(grid)  # Voeg GridLayout toe aan het scherm
+        grid = GridLayout(cols=4)
+        self.add_widget(grid)
 
-        # Dynamisch knoppen aanmaken op basis van de data_list
         for item in data_list:
             btn = Button(text=item)
-            btn.bind(on_press=self.button_click)  # Functie koppelen aan knopdruk
-            grid.add_widget(btn)  # Voeg knoppen toe aan GridLayout
+            btn.bind(on_press=self.button_click)
+            grid.add_widget(btn)
 
-    # Functie die wordt aangeroepen wanneer een knop wordt ingedrukt
     def button_click(self, instance):
+        # Set station of the zuil
         with open("module1/stationzuil.txt", "w") as f:
             f.write(instance.text)
         self.manager.current = 'root'
@@ -62,6 +63,7 @@ class MainApp(App):
         sm.add_widget(RootWidget(name='root'))
         sm.add_widget(DynamicGrid(name='dynamic'))
 
+        # check is station is set
         with open("module1/stationzuil.txt", "r") as f:
             city = f.read()
             print(city)

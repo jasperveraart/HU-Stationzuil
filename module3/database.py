@@ -5,6 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def execute(query):
+    """
+    Execute a SQL query to the database
+    :param query: SQL Statement
+    :return: output of query
+    """
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_NAME"),
@@ -53,6 +58,10 @@ def get_stations():
     return station_list
 
 def get_station_list():
+    """
+    Get a list of all station names
+    :return: list=[Amsterdam, Utrecht]
+    """
     reply = execute("select station_city from station_service")
     station_list = []
 
@@ -62,6 +71,10 @@ def get_station_list():
     return station_list
 
 def get_global_messages():
+    """
+    Get last 5 messages with required information for station screen
+    :return: [{message, city, name, facilities{ov_bike, elevator, toilet, park_and_ride}}]
+    """
     reply = execute("""select messages.message, 
                         facility.ov_bike, 
                         facility.elevator, 
@@ -71,8 +84,6 @@ def get_global_messages():
                         messages.name
                         from messages
                         join station_service as facility on messages.station = facility.station_city
-                        join moderation on messages.id = moderation.messagesid
-						where moderation.status = 2
                         order by messages.id desc 
                         limit 5 ;""")
     messages = []
@@ -96,7 +107,11 @@ def get_global_messages():
     return messages
 
 def get_station_messages(city):
-
+    """
+    Get last 5 messages of city with required information for station screen
+    :param city:
+    :return: [{message, city, name, facilities{ov_bike, elevator, toilet, park_and_ride}}]
+    """
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_NAME"),
@@ -114,9 +129,7 @@ def get_station_messages(city):
                         messages.name
                         from messages
                         join station_service as facility on messages.station = facility.station_city
-                        join moderation on messages.id = moderation.messagesid
                         where facility.station_city = %s
-                        and moderation.status = 2
                         order by messages.id desc 
                         limit 5 ;"""
     data = city,
@@ -148,6 +161,13 @@ def get_station_messages(city):
     return messages
 
 def add_message(message:str, city:str, name="anoniem"):
+    """
+    Add message to the database
+    :param message:
+    :param city:
+    :param name:
+    :return: none
+    """
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_NAME"),
