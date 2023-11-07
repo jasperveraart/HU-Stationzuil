@@ -1,0 +1,121 @@
+<RootWidget>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [50, 10]
+        spacing: 20
+
+        canvas.before:
+            Color:
+                rgba: (0xFF/255.0, 0xC9/255.0, 0x17/255.0, 1)
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
+        AnchorLayout:
+            height: '200dp'
+
+            Image:
+                source: 'nslogo.png'
+                size_hint: [1, 1]
+                width: '200dp'
+                height: '200dp'
+                anchor_x: 'center'
+
+        # spacer
+        Widget:
+            size_hint_y: None
+            height: 30
+
+
+
+        # Berichten invul veld met Label
+        BoxLayout:
+            orientation: 'vertical'
+            padding: [200, 0, 200, 0]
+            size_hint_y: None
+
+            Label:
+                size_hint_y: None
+                height: '30dp'
+                text: 'Feedback bericht'
+                font_name: "Arial"
+                font_size: 30
+                halign: 'left'
+                valign: 'middle'
+                text_size: self.size
+
+            TextInput:
+                font_name: "Arial"
+                font_size: '20sp'
+                hint_text: 'Bericht (max. 140 karakters)'
+                multiline: True
+
+                foreground_color: (0x00/255.0, 0x30/255.0, 0x82/255.0, 1)
+                cursor_color: (0x00/255.0, 0x63/255.0, 0xD3/255.0, 1)
+
+                size_hint_y: None
+                height: '100dp'
+
+                id: message
+
+                canvas.before:
+                    Color:
+                        rgba: (0x00/255.0, 0x30/255.0, 0x82/255.0, 1)
+                    Line:
+                        rectangle: (self.x, self.y, self.width, self.height)
+                        width: 2  # Breedte van de rand
+
+        Widget:
+            size_hint_y: None
+            height: 30
+
+
+        BoxLayout:
+            orientation: 'vertical'
+            padding: [200, 0, 200, 0]
+            size_hint_y: None
+
+            Label:
+                size_hint_y: None
+                height: '30dp'
+                text: 'Naam (laat leeg voor anoniem)'
+                font_name: "Arial"
+                font_size: 30
+                halign: 'left'
+                valign: 'middle'
+                text_size: self.size
+
+            TextInput:
+                font_name: "Arial"
+                font_size: '20sp'
+                hint_text: 'Anoniem'
+                multiline: False
+
+                foreground_color: (0x00/255.0, 0x30/255.0, 0x82/255.0, 1)
+                cursor_color: (0x00/255.0, 0x63/255.0, 0xD3/255.0, 1)
+
+                id: name
+
+                size_hint_y: None
+                height: '40dp'
+                padding_y: [(self.height - self.line_height) / 2] * 2
+
+
+                canvas.before:
+                    Color:
+                        rgba: (0x00/255.0, 0x30/255.0, 0x82/255.0, 1)
+                    Line:
+                        rectangle: (self.x, self.y, self.width, self.height)
+                        width: 2
+
+        BoxLayout:
+            padding: [200, 0, 200, 140]
+            Button:
+                font_size: '20sp'
+                font_name: "Arial"
+                size_hint_y: None
+                height: '50dp'
+                text: 'Verstuur'
+                background_normal: ''
+                background_color: (0x00/255.0, 0x30/255.0, 0x82/255.0, 1)
+                on_press: root.send_message()
