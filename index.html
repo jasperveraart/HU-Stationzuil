@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stationscherm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <meta http-equiv="refresh" content="30">
+
+    <style>
+        body {
+        background-color: #E6E6E9  ;
+        }
+
+        #city-input {
+        text-align: center;
+        font-size: 50px;
+        background-color: #003082;
+        color: white;
+        width: 600px;
+        height: 80px;
+        border: 5px solid white;
+        outline: none;
+        border: 5px solid #003082;
+        caret-color: transparent;
+        }
+
+        #city-input:focus {
+        border: 5px solid #fff;
+        outline: none;
+        }
+
+        .berichten {
+        font-size: 20px;
+        }
+
+        .naam-station {
+        font-size: 15px;
+        }
+
+        .center-block {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        }
+
+        #send_form {
+        display: none;
+        }
+    </style>
+</head>
+<body onload="get_messages()">
+
+<div class="container">
+
+    <!--    URL: https://api.openweathermap.org/data/2.5/weather?q={city},NL,&appid={key}-->
+
+    <div class="row">
+        <div class="col-12 text-center">
+            <form action="" id="input-form">
+                <input type="text" id="city-input" placeholder="Station">
+                <button id="send_form"></button>
+            </form>
+        </div>
+        <div class="col-8">
+            <h2 style="visibility: hidden">Berichten</h2>
+            <table class="table table-borderless table-striped">
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-4">
+            <h2 style="visibility: hidden">Weerbericht</h2>
+            <img id="weather-img" src="https://openweathermap.org/img/wn/04n@4x.png" alt="" class="center-block">
+            <p id="weather-description" class="text-center">Omschrijving</p>
+            <div class="text-center" style="font-size: 30px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-thermometer-half" viewBox="0 0 16 16">
+                    <path d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V6.5a.5.5 0 0 1 1 0v4.585a1.5 1.5 0 0 1 1 1.415z"/>
+                    <path d="M5.5 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0V2.5zM8 1a1.5 1.5 0 0 0-1.5 1.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0l-.166-.15V2.5A1.5 1.5 0 0 0 8 1z"/>
+                </svg>
+                <p style="display: inline" id="weather-temp">0.0 &#176;</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script></body>
+</html>
+
+<script>
+    async function get_weather(city) {
+        await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + city + ",NL,&appid=abec9cf079a1e21174b75a436f60f45f&lang=nl&units=metric")
+            .then(response => response.json()) // Convert the response to JSON
+            .then(data => {
+                document.getElementById("weather-description").innerText = data["weather"][0]["description"]
+                document.getElementById("weather-img").src="https://openweathermap.org/img/wn/" + data["weather"][0]["icon"] +"@4x.png"
+                document.getElementById("weather-temp").innerHTML =  data["main"]["temp"] + "&#176;"
+            })
+    }
+    // This is the function that will fill in the table with data
+
+    // This is the function that will fill in the table with data
+    function fillTableWithData(messages) {
+        // Find the table body in the DOM
+        const tableBody = document.querySelector('.table tbody');
+
+        // Clear the existing rows in the table body
+        tableBody.innerHTML = '';
+
+        // Iterate over the messages and create table rows for each
+        messages.forEach(message => {
+            // Create the row element
+            const row = document.createElement('tr');
+
+
+            // Create SVG HTML if booleans are true, otherwise set an empty string
+            const toilet = message.facilities["toilet"] ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-badge-wc-fill" viewBox="0 0 16 16"> <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm11.666 1.89c.682 0 1.139.47 1.187 1.107H14v-.11c-.053-1.187-1.024-2-2.342-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.905 2.73 2.518 2.73 1.314 0 2.285-.792 2.342-1.939v-.114h-1.147c-.048.615-.497 1.05-1.187 1.05-.839 0-1.318-.62-1.318-1.727v-.742c0-1.112.488-1.754 1.318-1.754zm-6.188.926h.044L6.542 11h1.006L9 5.001H7.818l-.82 4.355h-.056L5.97 5.001h-.94l-.972 4.355h-.053l-.827-4.355H2L3.452 11h1.005l1.02-4.184z"/> </svg>' : '';
+            const elevator = message.facilities["elevator"] ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16"> <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/> </svg>' : '';
+            const ov_bike = message.facilities["ov_bike"] ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16"> <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/> </svg>' : '';
+            const park_and_ride = message.facilities["park_and_ride"] ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-p-square-fill" viewBox="0 0 16 16"> <path d="M8.27 8.074c.893 0 1.419-.545 1.419-1.488s-.526-1.482-1.42-1.482H6.778v2.97H8.27Z"/> <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2Zm3.5 4.002h2.962C10.045 4.002 11 5.104 11 6.586c0 1.494-.967 2.578-2.55 2.578H6.784V12H5.5V4.002Z"/> </svg>' : '';
+
+            // Set the innerHTML for the row including the SVGs conditionally
+            row.innerHTML = `
+            <td style="width:80%">
+                <p class="berichten">${message.message}</p>
+                <p class="naam-station">${message.name} - ${message.city}</p>
+            </td>
+            <td style="width: 5%">${toilet}</td>
+            <td style="width: 5%">${elevator}</td>
+            <td style="width: 5%">${ov_bike}</td>
+            <td style="width: 5%">${park_and_ride}</td>
+        `;
+
+            // Append the row to the table body
+            tableBody.appendChild(row);
+        });
+    }
+
+    const messagesFromResponse = [
+        {
+            name: 'Error',
+            city: 'Undefined',
+            message: 'No connection with server',
+            facilities: {
+                toilet: true,
+                elevator: true,
+                ov_bike: true,
+                park_and_ride: true
+            }
+        },
+        // ... more message objects
+    ];
+
+    // Fill the table with the data:
+    const input = document.getElementById("city-input");
+    const form = document.getElementById("input-form");
+
+    input.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault()
+            document.getElementById("send_form").click()
+            get_messages(input.value)
+            get_weather(input.value)
+        }
+    });
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault()
+    });
+
+    setTimeout( function() {
+        get_messages(input.value)
+        get_weather(input.value)
+    }, 30000);
+
+
+    async function get_messages(city) {
+        await fetch("http://127.0.0.1:8000/stationinfo/" + city)
+            .then(response => response.json()) // Convert the response to JSON
+            .then(data => {
+                // Make sure you're referencing the 'Messages' key of your response object
+                if (data && Array.isArray(data.Messages)) {
+                    fillTableWithData(data.Messages); // Pass the Messages array to the function
+                }
+            })
+            .catch(fillTableWithData(messagesFromResponse));
+    }
+</script>
